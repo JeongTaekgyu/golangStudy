@@ -34,6 +34,10 @@ type User struct {
 // Go:   관례적으로 New함수명() 함수를 만들어서 사용
 func NewUser(id int, name string, email string) *User {
 	// 유효성 검사도 여기서!
+
+	// &User{...} 는 아래 두 줄과 완전히 동일한 축약형
+	// u := User{ID: id, Name: name, Email: email, age: 0}  // 1. struct 생성
+	// return &u                                             // 2. 그 주소를 반환
 	return &User{
 		ID:    id,
 		Name:  name,
@@ -56,8 +60,15 @@ func (u User) Greet() string {
 // 포인터 리시버 (Pointer Receiver): 원본을 직접 변경
 // Java의 setter 같은 상태 변경 메서드에 사용
 // 📌 규칙: 상태 변경이 필요하면 항상 포인터 리시버 사용!
-func (u *User) ChangeName(name string) {
+func (u *User) ChangeNameByPointer(name string) {
 	u.Name = name // 원본 User.Name이 실제로 바뀜
+}
+
+// ❌ 값 리시버로 이름 변경 시도 → 원본 변경 안 됨 (비교용)
+// u User 로 받으면 복사본이 넘어오기 때문에 원본은 그대로
+func (u User) ChangeNameByValue(name string) {
+	u.Name = name // 복사본의 Name만 바뀜 → 함수 끝나면 사라짐
+	fmt.Printf("함수 내부: %s ← 복사본은 바뀜\n", u.Name)
 }
 
 func (u *User) SetAge(age int) {
@@ -136,12 +147,16 @@ func main() {
 	// ----------------------------------------
 	fmt.Println("2. 값 리시버 vs 포인터 리시버")
 
-	user := NewUser(1, "원래이름", "test@example.com")
+	user := User{ID: 1, Name: "원래이름"}
 	fmt.Printf("변경 전: %s\n", user.Name)
 
 	// 포인터 리시버: 원본이 변경됨
-	user.ChangeName("바뀐이름")
-	fmt.Printf("변경 후: %s\n", user.Name)
+	user.ChangeNameByPointer("바뀐이름")
+	fmt.Printf("변경 후 (포인터 리시버): %s\n", user.Name)
+
+	// 값 리시버: 원본이 변경 안 됨
+	user.ChangeNameByValue("변경시도-이름")
+	fmt.Printf("변경 후 (값 리시버):    %s ← 그대로! *** \n", user.Name)
 
 	// 메서드 호출 (값 리시버)
 	fmt.Println(user.Greet())
@@ -155,17 +170,17 @@ func main() {
 	// ----------------------------------------
 	fmt.Println("3. Struct 복사 주의사항")
 
-	original := User{ID: 1, Name: "원본"}
+	original := User{ID: 1, Name: "원본 이름"}
 	copied := original // 값 복사 → 완전히 독립된 복사본
-	copied.Name = "복사본"
+	copied.Name = "복사본 이름"
 
 	fmt.Printf("원본: %s\n", original.Name) // "원본" 그대로
 	fmt.Printf("복사본: %s\n\n", copied.Name)
 
 	// 포인터로 복사하면? → 같은 주소를 가리킴
-	ptr1 := &User{ID: 2, Name: "포인터원본"}
+	ptr1 := &User{ID: 2, Name: "포인터원본111"}
 	ptr2 := ptr1 // 주소 복사 → 같은 User를 가리킴!
-	ptr2.Name = "포인터변경"
+	ptr2.Name = "포인터변경222"
 
 	fmt.Printf("ptr1: %s\n", ptr1.Name) // "포인터변경"으로 바뀜!
 	fmt.Printf("ptr2: %s\n\n", ptr2.Name)
@@ -189,14 +204,14 @@ func main() {
 	}
 
 	// 임베딩된 필드에 직접 접근 가능 (Java의 상속처럼)
-	fmt.Printf("Admin 이름: %s\n", admin.Name)          // admin.User.Name 과 동일
-	fmt.Printf("Admin 이메일: %s\n", admin.Email)        // admin.User.Email 과 동일
-	fmt.Printf("Admin 도시: %s\n", admin.City)           // admin.Address.City 와 동일
+	fmt.Printf("Admin 이름: %s\n", admin.Name)   // admin.User.Name 과 동일
+	fmt.Printf("Admin 이메일: %s\n", admin.Email) // admin.User.Email 과 동일
+	fmt.Printf("Admin 도시: %s\n", admin.City)   // admin.Address.City 와 동일
 	fmt.Printf("Admin 레벨: %d\n", admin.Level)
 
 	// 임베딩된 메서드도 직접 호출 가능!
-	fmt.Println(admin.Greet())            // User의 메서드
-	fmt.Println(admin.FullAddress())      // Address의 메서드
+	fmt.Println(admin.Greet())       // User의 메서드
+	fmt.Println(admin.FullAddress()) // Address의 메서드
 	fmt.Println()
 
 	// ----------------------------------------
@@ -208,7 +223,7 @@ func main() {
 		ID: 1001,
 		Customer: User{
 			ID:   1,
-			Name: "구매자",
+			Name: "김구매자",
 		},
 		Amount: 99000,
 	}
@@ -226,7 +241,7 @@ func main() {
 	b := User{ID: 1, Name: "테스트"}
 	c := User{ID: 2, Name: "다른사람"}
 
-	fmt.Printf("a == b: %t\n", a == b) // true (모든 필드가 같으면 equal)
+	fmt.Printf("a == b: %t\n", a == b)   // true (모든 필드가 같으면 equal)
 	fmt.Printf("a == c: %t\n\n", a == c) // false
 
 	// ----------------------------------------
@@ -247,7 +262,7 @@ class Admin extends User {          type Admin struct {
 }                                       Level int
                                     }
 
-user.setName("변경")                 user.ChangeName("변경")  // 포인터 리시버
+user.setName("변경")                 user.ChangeNameByPointer("변경")  // 포인터 리시버
 user.getName()                      user.Name                // 직접 접근 (public이면)
 	`)
 
