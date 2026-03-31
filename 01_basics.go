@@ -30,7 +30,7 @@ func main() {
 	// 방법 2: var 키워드 사용 (타입 추론)
 	// var 변수명 = 값 (타입을 Go가 알아서 추론)
 	var city = "서울" // string으로 자동 추론
-	var count = 100   // int로 자동 추론
+	var count = 100 // int로 자동 추론
 	fmt.Printf("도시: %s, 카운트: %d\n", city, count)
 
 	// 방법 3: := 단축 선언 ⭐⭐⭐ 가장 많이 씀!
@@ -103,11 +103,11 @@ func main() {
 	// ----------------------------------------
 	fmt.Println("4. 제로값 (초기화 안 하면 자동으로 들어가는 값)")
 
-	var zeroInt int        // 0
-	var zeroFloat float64  // 0.0
-	var zeroString string  // "" (빈 문자열)
-	var zeroBool bool      // false
-	var zeroPointer *int   // nil
+	var zeroInt int       // 0
+	var zeroFloat float64 // 0.0
+	var zeroString string // "" (빈 문자열)
+	var zeroBool bool     // false
+	var zeroPointer *int  // nil
 
 	fmt.Printf("int 제로값: %d\n", zeroInt)
 	fmt.Printf("float64 제로값: %.1f\n", zeroFloat)
