@@ -63,7 +63,7 @@ func findUser(id int) (*User, error) {
 // 패키지 레벨에서 미리 정의해두는 에러 값
 // Java의 특정 Exception 클래스와 비슷한 역할
 var (
-	ErrNotFound    = errors.New("not found")
+	ErrNotFound     = errors.New("not found")
 	ErrUnauthorized = errors.New("unauthorized")
 	ErrInvalidInput = errors.New("invalid input")
 )
@@ -229,7 +229,7 @@ func main() {
 	// errors.As(): 에러가 특정 타입인지 확인 + 해당 타입으로 변환
 	// Java: catch (ValidationException e) { e.getField() }
 	users := []*User{
-		{ID: 1, Name: ""},  // ValidationError 발생
+		{ID: 1, Name: ""},    // ValidationError 발생
 		{ID: 0, Name: "김철수"}, // DatabaseError 발생
 		{ID: 2, Name: "이영희"}, // 정상
 	}

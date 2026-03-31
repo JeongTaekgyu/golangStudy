@@ -154,7 +154,7 @@ func deferOrder() {
 // ============================================
 
 func main() {
-	fmt.Println("=== Go 함수 학습 ===\n")
+	fmt.Println("========================== Go 함수 학습 ==========================\n")
 
 	// ----------------------------------------
 	// 1. 기본 함수 호출
@@ -248,7 +248,7 @@ func main() {
 	// makeMultiplier 활용
 	times3 := makeMultiplier(3)
 	times5 := makeMultiplier(5)
-	fmt.Printf("times3(4) = %d\n", times3(4)) // 12
+	fmt.Printf("times3(4) = %d\n", times3(4))   // 12
 	fmt.Printf("times5(4) = %d\n\n", times5(4)) // 20
 
 	// ----------------------------------------
