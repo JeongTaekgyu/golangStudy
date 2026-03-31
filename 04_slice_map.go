@@ -11,13 +11,26 @@ import "fmt"
 //   Java: HashMap    → Go: Map
 //
 // 실무에서 가장 많이 쓰는 자료구조 2가지!
+//
+// ┌─────────────────────────────────────────────────────┐
+// │              Slice vs Map 핵심 차이                   │
+// ├──────────────┬──────────────────┬───────────────────┤
+// │              │ Slice            │ Map               │
+// ├──────────────┼──────────────────┼───────────────────┤
+// │ 구조          │ 순서 있는 목록       │ 키-값 쌍           │
+// │ 접근 방법      │ 인덱스 s[0]        │ 키 m["apple"]     │
+// │ 순서          │ 유지됨             │ 보장 안 됨          │
+// │ Java 대응     │ ArrayList        │ HashMap           │
+// ├──────────────┼──────────────────┼───────────────────┤
+// │ 언제 쓰나?     │ 순서가 중요할 때     │ 키로 빠르게 찾을때.    │
+// └──────────────┴──────────────────┴───────────────────┘
 
 // ============================================
 // SLICE
 // ============================================
 
 func main() {
-	fmt.Println("=== Slice & Map 학습 ===\n")
+	fmt.Println("========================== Slice & Map 학습 ==========================\n")
 
 	// ----------------------------------------
 	// 1. Slice 선언 방법
@@ -32,14 +45,14 @@ func main() {
 	// make([]타입, 길이, 용량)
 	scores := make([]int, 3)      // [0, 0, 0] 길이 3짜리 슬라이스
 	scores2 := make([]int, 3, 10) // 길이 3, 용량 10 (내부 배열은 10칸 확보)
-	fmt.Printf("scores: %v\n", scores)
+	fmt.Printf("scores: %v (len=%d, cap=%d)\n", scores, len(scores), cap(scores))
 	fmt.Printf("scores2: %v (len=%d, cap=%d)\n", scores2, len(scores2), cap(scores2))
 
 	// 방법 3: var로 선언 (nil slice)
-	var nilSlice []int  // nil (아직 메모리 할당 안 됨)
+	var nilSlice []int    // nil (아직 메모리 할당 안 됨)
 	emptySlice := []int{} // empty (메모리는 할당됨, 길이 0)
 
-	fmt.Printf("nilSlice == nil: %t\n", nilSlice == nil)   // true
+	fmt.Printf("nilSlice == nil: %t\n", nilSlice == nil)       // true
 	fmt.Printf("emptySlice == nil: %t\n\n", emptySlice == nil) // false
 
 	// ----------------------------------------
@@ -88,7 +101,17 @@ func main() {
 	s = append(s, 2)
 	fmt.Printf("append 1개 후 → len=%d, cap=%d\n", len(s), cap(s))
 
-	s = append(s, 3) // cap 초과 → 내부적으로 새 배열 할당 (cap 자동 증가)
+	s = append(s, 3) // cap(5) 초과 → Go가 내부적으로 새 배열을 할당
+	// cap 증가 규칙:
+	//   - cap이 1024 미만일 때: 대략 2배로 증가
+	//   - 기존 cap(5) × 2 = 10 → cap이 10이 됨
+	//   - 단, 정확히 2배가 아닐 수 있음 (Go 런타임이 메모리 정렬 등을 고려해 조정)
+	//
+	// 내부 동작:
+	//   1. cap=10인 새 배열을 메모리에 새로 할당
+	//   2. 기존 [0,0,0,1,2] 를 새 배열에 복사
+	//   3. 값 3 추가 → [0,0,0,1,2,3]
+	//   4. s가 새 배열을 가리키도록 변경
 	fmt.Printf("cap 초과 후  → len=%d, cap=%d\n\n", len(s), cap(s))
 
 	// ----------------------------------------
@@ -99,8 +122,8 @@ func main() {
 	nums := []int{0, 1, 2, 3, 4, 5}
 
 	fmt.Printf("nums:       %v\n", nums)
-	fmt.Printf("nums[1:4]:  %v\n", nums[1:4]) // 인덱스 1~3
-	fmt.Printf("nums[:3]:   %v\n", nums[:3])  // 처음~인덱스 2
+	fmt.Printf("nums[1:4]:  %v\n", nums[1:4])  // 인덱스 1~3
+	fmt.Printf("nums[:3]:   %v\n", nums[:3])   // 처음~인덱스 2
 	fmt.Printf("nums[3:]:   %v\n\n", nums[3:]) // 인덱스 3~끝
 
 	// ----------------------------------------
@@ -121,7 +144,7 @@ func main() {
 	fmt.Println("7. Slice 복사 주의사항")
 
 	original := []int{1, 2, 3}
-	shared := original    // ❌ 주소 공유! 같은 배열을 가리킴
+	shared := original // ❌ 주소 공유! 같은 배열을 가리킴
 	shared[0] = 999
 
 	fmt.Printf("original: %v\n", original) // [999 2 3] ← 같이 바뀜!
@@ -182,11 +205,21 @@ func main() {
 	// ✅ 키 존재 여부 확인 (실무 필수 패턴!)
 	// Java: map.containsKey("apple")
 	// Go:   value, ok := map[key]
+	//
+	// map 조회는 항상 이 순서로 2개 반환 (Go 언어 스펙에 고정)
+	//   1번째: 실제 값 (키가 없으면 제로값 반환)
+	//   2번째: 키 존재 여부 (bool) → 관례적으로 ok 라는 이름 사용
+	//
+	//   value := m["apple"]        // 값만 받을 때 (1개)
+	//   value, ok := m["apple"]    // 값 + 존재여부 받을 때 (2개)
 	value, ok := m["apple"]
 	fmt.Printf("apple 존재: %t, 값: %d\n", ok, value)
 
 	value2, ok2 := m["없는키"]
-	fmt.Printf("없는키 존재: %t, 값: %d\n\n", ok2, value2)
+	fmt.Printf("없는키 존재: %t, 값: %d\n", ok2, value2)
+
+	value3, ok3 := m["cherry"]
+	fmt.Printf("cherry 존재: %t, 값: %d\n\n", ok3, value3)
 
 	// Delete
 	delete(m, "banana")
