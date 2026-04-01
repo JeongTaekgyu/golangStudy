@@ -293,12 +293,12 @@ func main() {
 	// ----------------------------------------
 	fmt.Println("6. 인터페이스 nil 주의사항")
 
-	var n Notifier = nil // 인터페이스 자체가 nil
+	var n Notifier = nil                    // 인터페이스 자체가 nil
 	fmt.Printf("nil 인터페이스: %v\n", n == nil) // true
 
 	// 📌 주의: 인터페이스에 nil 포인터를 담으면 nil이 아님!
-	var email *EmailNotifier = nil // 포인터가 nil
-	var notifier Notifier = email  // 인터페이스에 nil 포인터 담기
+	var email *EmailNotifier = nil                           // 포인터가 nil
+	var notifier Notifier = email                            // 인터페이스에 nil 포인터 담기
 	fmt.Printf("nil 포인터를 담은 인터페이스: %v\n\n", notifier == nil) // false! 함정!
 
 	// ----------------------------------------

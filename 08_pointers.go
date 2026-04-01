@@ -172,23 +172,29 @@ func main() {
 	// ----------------------------------------
 	fmt.Println("=== Java vs Go 비교 ===")
 	fmt.Println(`
+Java 타입별 원본 변경 여부:
+  기본 타입 (int, double, boolean 등) → 값 복사 → 원본 안 바뀜
+  객체 타입 (User, List 등)           → 참조 전달 → 원본 바뀜
+  → Java는 타입에 따라 자동으로 결정됨 (개발자가 선택 불가)
+
+Go 타입별 원본 변경 여부:
+  모든 타입 (int, struct 등) 기본 → 값 복사 → 원본 안 바뀜
+  & 붙이면                        → 포인터 전달 → 원본 바뀜
+  → Go는 타입 상관없이 개발자가 명시적으로 선택
+
 Java:                               Go:
-// Java는 객체를 항상 참조로 전달    // Go는 개발자가 명시적으로 선택
-// 개발자가 신경 쓸 필요 없음        // & * 기호로 직접 제어
-
-User user = new User();             user := User{}        // 값
-// user는 사실 참조(포인터)          ptr := &User{}        // 포인터
-
-void changeName(User u) {           func changeName(u *User) {
-  u.setName("변경");  // 원본 바뀜      u.Name = "변경"  // 원본 바뀜
-}                                   }
-// Java 객체는 항상 참조 전달        // Go는 & 붙여야 원본 변경 가능
-
+// ❌ 기본 타입: 원본 안 바뀜        // ❌ & 없음: 원본 안 바뀜
 int x = 10;                         x := 10
-void addTen(int n) {                func addTen(n *int) {
-  n += 10; // 원본 안 바뀜              *n += 10 // 원본 바뀜
+void addTen(int n) {                func addTen(n int) {
+  n += 10; // 복사본만 바뀜             n += 10 // 복사본만 바뀜
 }                                   }
-                                    addTen(&x) // 명시적으로 주소 전달
+
+// ✅ 객체 타입: 원본 바뀜           // ✅ & 붙임: 원본 바뀜
+void changeName(User u) {           func addTen(n *int) {
+  u.setName("변경"); // 원본 바뀜       *n += 10 // 원본 바뀜
+}                                   }
+// Java는 객체면 자동으로 참조 전달  addTen(&x) // 명시적으로 주소 전달
+// 개발자가 선택 불가               // Go는 항상 개발자가 선택
 	`)
 
 	// ----------------------------------------
